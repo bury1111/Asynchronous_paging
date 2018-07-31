@@ -12,3 +12,8 @@ tsl实现异步分页
   where rownumber >n  //m为第几页 n=m*num
 *)
 ```
+##### 注意字符串拼接用$符
+##### 前端绑定动态事件一定要注意标签要事先存在才可绑定 如：$("#page").on('click','a',function () {  } //为a标签动态绑定事件 中a一定要事先存在，这样的话js代码要放在id为page的div后面
+
+###### 使用$.parseJSON(response);来将返回的json数据转换成对象进行显示输出
+
