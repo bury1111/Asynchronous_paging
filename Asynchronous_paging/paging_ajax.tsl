@@ -1,0 +1,67 @@
+//设置ajax编码问题
+httpSetHeadString("Content-Type:text/html; Charset=gb2312;\r\n\r\n") ;
+  page:=httpgetqueryvaluebyname("page");
+
+
+(* 分页查询
+  select top num * //num为每页的行数
+  from
+  (
+   select row_number() over(order by file_name) as rownumber,* from file_list
+  ) A
+  where rownumber >n  //m为第几页 n=m*num
+*)
+//设置每页显示几条数据
+num:=5;
+m:=StrToInt(page);
+n:=num*(m-1);
+//return echo ifint(n);
+//num为每页的行数     m为第几页 n=m*num
+//异步分页sql
+sql:=' select top '$num$' *
+  from
+  (
+   select row_number() over(order by id) as rownumber,* from file_list
+  ) A
+  where rownumber >'$n;
+//return echo sql;
+//连接数据库
+if not Execsql("test_file",sql,r) then return echo r;
+rel:=class(tstools).Arr2Json(r);//将查询的数据转换为json形式
+AFromText := '"rownumber":,';
+AToText := '';
+rel1:=ReplaceStr(rel, AFromText, AToText);
+//（计算页数）查出总条数除以每行条数即为页数
+//if not Execsql("test_file","select * from file_list",r) then return echo r;
+total:= 6;
+rel2:=leftstr(rel1,lengthw(rel1)-1);
+return echo rel2+','+'{"total":'$total$'}]';
+
+
+
+
+(*
+//设置路径
+path:="C:\\Users\\bury\\Desktop\\clearcache\\file";
+//获取所有文件信息返回数组
+ret:=ListFileDir(path);
+r:= array();
+data:=array();
+//获取文件信息到二维数组
+r:= GetList(path);
+
+//拼接方法使数组转换成json格式的字符串
+data1:='';
+AFromText:='\\';//需要替换的字符串（注意转义）
+AToText:='\\\\';//替换成的字符串
+//return echo ReplaceStr(r[0][1],AFromText,AToText);
+for i:=0 to length(r)-1 do
+  begin
+  data[i]:='{"filename":"'+r[i][0]+'","path":"'+ReplaceStr(r[i][1],AFromText,AToText)+'","size":"'+r[i][2]+'","time":"'+r[i][3]+'"},';
+  data1:=data1+data[i];
+  end;
+data2:= leftstr(data1,lengthw(data1)-1);
+data3:='['+leftstr(data1,lengthw(data1)-1)+',{"total":2},{"page":'+page+'}]';//拼接完成的json数据
+//return echo '[{"filename":"test1.txt","path":"C:\\\\Users\\\\bury\\\\Desktop\\\\clearcache\\\\file","size":"54","time":"2018/7/20 16:13:14"},{"filename":"test1.txt","path":"C:\\\\Users\\\\bury\\\\Desktop\\\\clearcache\\\\file","size":"54","time":"2018/7/20 16:13:14"},{"filename":"test1.txt","path":"C:\\\\Users\\\\bury\\\\Desktop\\\\clearcache\\\\file","size":"54","time":"2018/7/20 16:13:14"},{"total":2},{"page":'+page+'}]';
+return echo data3;
+*)

@@ -1,0 +1,79 @@
+
+<?tslx>
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<script type="text/javascript" src="../js/jquery-3.3.1.js"></script>
+<script type="text/javascript" >
+
+</script>
+<title>Ajax 实现无刷新页面</title>
+<link rel="Stylesheet" type="text/css" href="../css/test2.css" />
+</head>
+<body>
+<table id="mytable">
+  <thead>
+  <tr>
+  <th scope="col" id="myth">filename</th>
+  <th scope="col" id="myth">path</th>
+  <th scope="col" id="myth">size</th>
+  <th scope="col" id="myth">time</th>
+  <th scope="col" id="myth">comments</th>
+  </tr>
+  </thead>
+  <tbody id="content">
+
+  </tbody>
+  <tfoot>
+
+  </tfoot>
+</table>
+<div id="page"></div>
+
+<script type="text/javascript">
+    var page =1;
+    getList(page);
+    function getList(page){
+        $.ajax({
+            type:"post",
+            data:{page:page},
+            url:"paging_ajax.tsl",
+            success:function(response){
+                //alert(response);
+                //console.log('{"a":"b","b":"\\\\"}')
+              var jso = $.parseJSON(response);
+              // alert(jso[5].total);
+                var s = '';
+                for (var i = 0; i <= jso.length-2; i++) {
+                s +='<tr><td>'+jso[i].file_name+'</td>'+
+                        '<td>'+jso[i]._path+'</td>'+
+                        '<td>'+jso[i].size+'</td>'+
+                        '<td>'+jso[i]._time+'</td>'+
+                        '<td>'+'备用'+'</td>'+
+                        '</tr>';
+                  }
+                $("#content").html(s);
+
+                var s = '';
+                for (var j = 1; j <= jso[i].total; j++) {  //json[i].total是后台传过来的页数
+                   //输出分页链接
+                   if (page == j) s += '<a href="javascript:void(0)" data="' + j + '" class="selected">' + j + '</a>';
+                   else s += '<a href="javascript:void(0)" data="' + j + '">' + j + '</a>';
+               }
+               $("#page").html(s);
+
+            }
+
+        });
+
+    }
+
+    $("#page").on('click','a',function () {   //为a标签动态绑定事件
+           var page=$(this).attr("data");  //获取链接里的页码
+           //alert(page);//测试读取页码
+           getList(page);
+       });
+</script>
+</body>
+</html>
